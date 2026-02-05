@@ -9,3 +9,6 @@ frontend/dist/
 
 # logs
 npm-debug.log*
+
+# my files (FMI)
+for-mine.js
