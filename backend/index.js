@@ -8,6 +8,7 @@ import { sessionMiddleware } from "./middleware/session.js";
 import adminRoutes from "./routes/admin.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
+import listingsRoutes from "./routes/listings.routes.js";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -26,6 +27,7 @@ app.use(sessionMiddleware(pool));
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/listings", listingsRoutes);
 
 // **************  SERVE REACT    ********************************
 
