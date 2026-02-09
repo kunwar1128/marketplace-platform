@@ -1,6 +1,6 @@
 # Marketplace Platform
 
-A full-stack marketplace platform built with **React**, **Express**, and **PostgreSQL**, designed to scale from a small client website into a Kijiji-style classifieds marketplace.
+A full-stack marketplace platform built with **React**, **Express**, and **PostgreSQL**, focusing on clean architecture, data integrity, and scalable design. The system supports authenticated users, listings management, and admin moderation, and is designed to evolve into a production-ready classified listings application.
 
 ## Tech Stack
 
