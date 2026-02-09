@@ -16,14 +16,19 @@ A full-stack marketplace platform built with **React**, **Express**, and **Postg
 - Session-based authentication (admin)
 - Secure login/logout with hashed passwords
 - Admin-protected API routes
-- Admin inbox for contact messages with:
+- Contact form backend with:
   - message storage
   - read/unread status
   - delete functionality
+- Marketplace listings backend:
+  - create listings (authenticated users)
+  - browse listings (public)
+  - server-side validation + database constraints
 - Clean backend architecture:
   - routes
   - middleware
   - database layer
+  - shared validation utilities
 - React frontend with auth-aware UI
 - One-domain production setup (no CORS in production)
 
