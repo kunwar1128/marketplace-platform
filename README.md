@@ -58,13 +58,20 @@ marketplace-platform/
 
 ## In Progress / Planned Features
 
-- Marketplace listings (CRUD)
-- Browse, search, and filter listings
+- React UI for browsing listings
+- Create listing form (frontend)
+- Pagination and filtering
 - User-to-user messaging
 - Favorites and saved listings
 - Admin moderation tools
-- Pagination and performance optimizations
+- Database migrations
 - Production deployment with managed PostgreSQL
+
+## Data Integrity & Validation
+
+- Input validation at the API layer for clear user feedback
+- Database-level constraints to guarantee data integrity
+- Shared validation utilities to avoid duplication
 
 ## Why This Project
 
