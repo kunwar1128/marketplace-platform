@@ -1,4 +1,4 @@
-import { apiFetch } from "../api";
+import { apiFetch } from "../api/apiFetch";
 import { useEffect, useState } from "react";
 
 function AdminInbox({ user }) {
