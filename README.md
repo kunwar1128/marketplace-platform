@@ -7,7 +7,7 @@ A full-stack marketplace platform built with **React**, **Express**, and **Postg
 - **Frontend:** React (Vite)
 - **Backend:** Node.js, Express
 - **Database:** PostgreSQL
-- **Auth:** Session-based authentication (cookies), role-based authorization (admin)
+- **Auth:** Session-based authentication (cookies), role-based authorization
 - **ORM / DB Access:** `pg` with connection pooling
 - **Deployment:** Single-domain (Express serves React build)
 
@@ -20,16 +20,22 @@ A full-stack marketplace platform built with **React**, **Express**, and **Postg
   - message storage
   - read/unread status
   - delete functionality
-- Marketplace listings backend:
+- Marketplace listings:
   - create listings (authenticated users)
   - browse listings (public)
-  - server-side validation + database constraints
+  - frontend CreateListing page
+  - backend validation + database constraints
 - Clean backend architecture:
   - routes
   - middleware
   - database layer
   - shared validation utilities
-- React frontend with auth-aware UI
+- React frontend with:
+  - protected routes
+  - role-based route guards (admin-only views)
+  - auth session validation via `/api/auth/me`
+  - Create Listing page (authenticated users)
+  - listings browsing with pagination
 - One-domain production setup (no CORS in production)
 
 ## Architecture Overview
@@ -40,26 +46,61 @@ A full-stack marketplace platform built with **React**, **Express**, and **Postg
 - **Sessions** stored server-side for security
 - Clear separation of concerns across frontend and backend
 
+### Frontend Architecture
+
+- React Router v6 with centralized route definitions
+- Layout component using `<Outlet />`
+- Separation of pages, routes, and shared components
+- AbortController for safe async request handling
+- API abstraction via shared `apiFetch` utility
+
 ## Project Structure
 
 ```text
 marketplace-platform/
 ├── backend/
-│   ├── routes/
-│   ├── middleware/
 │   ├── db/
+│   │   └── database.js
+│   ├── middleware/
+│   │   ├── auth.js
+│   │   └── session.js
+│   ├── routes/
+│   │   ├── admin.routes.js
+│   │   ├── auth.routes.js
+│   │   ├── contact.routes.js
+│   │   └── listings.routes.js
+│   ├── utils/
+│   │   └── validation.js
 │   └── index.js
+│
 ├── frontend/
 │   ├── src/
-│   ├── public/
-│   └── dist/
+│   │   ├── api/
+│   │   │   └── apiFetch.js
+│   │   ├── components/
+│   │   │   └── AdminInbox.jsx
+│   │   ├── hooks/
+│   │   ├── layouts/
+│   │   │   └── Layout.jsx
+│   │   ├── pages/
+│   │   │   ├── CreateListing.jsx
+│   │   │   ├── ListingsBrowse.jsx
+│   │   │   └── Login.jsx
+│   │   ├── routes/
+│   │   │   ├── AppRoutes.jsx
+│   │   │   ├── LoginRoute.jsx
+│   │   │   ├── RequireAdmin.jsx
+│   │   │   └── RequireAuth.jsx
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   └── vite.config.js
+│
 └── README.md
+
 ```
 
 ## In Progress / Planned Features
 
-- React UI for browsing listings
-- Create listing form (frontend)
 - Pagination and filtering
 - User-to-user messaging
 - Favorites and saved listings
@@ -75,7 +116,7 @@ marketplace-platform/
 
 ## Why This Project
 
-This project is built as a **real-world production system**, focusing on:
+This project is designed with **production-grade architecture**, focusing on:
 
 - clean architecture
 - security best practices
