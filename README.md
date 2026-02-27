@@ -27,6 +27,7 @@ A full-stack marketplace platform built with **React**, **Express**, and **Postg
 - Client-side validation
 - Server-side validation + database constraints
 - Browse listings with pagination
+- Listing detail page (`/listings/:id`) with full listing info
 
 ### Contact System
 
@@ -58,6 +59,9 @@ A full-stack marketplace platform built with **React**, **Express**, and **Postg
 - Separation of pages, routes, and shared components
 - AbortController for safe async request handling
 - API abstraction via shared `apiFetch` utility
+- ListingDetail page (accessible via `/listings/:id`)
+- Clickable listings in Browse page
+- Proper error handling for not found listings
 
 ## Project Structure
 
