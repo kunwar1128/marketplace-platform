@@ -7,6 +7,7 @@ import Layout from "../layouts/Layout";
 import RequireAuth from "./RequireAuth";
 import RequireAdmin from "./RequireAdmin";
 import LoginRoute from "./LoginRoute";
+import ListingDetail from "../pages/ListingDetail";
 
 function AppRoutes({ user, setUser, onLogout }) {
   return (
@@ -37,6 +38,8 @@ function AppRoutes({ user, setUser, onLogout }) {
             </RequireAuth>
           }
         />
+
+        <Route path="/listings/:id" element={<ListingDetail />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

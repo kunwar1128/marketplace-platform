@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { apiFetch } from "../api/apiFetch";
 
 function formatMoney(priceCents, currency = "CAD") {
@@ -132,9 +133,11 @@ export default function ListingsBrowse() {
               }}
             >
               <div>
-                <h3 style={{ margin: "0 0 6px 0" }}>{l.title}</h3>
+                <Link to={`/listings/${l.id}`}>
+                  <h3 style={{ margin: "0 0 6px 0" }}>{l.title}</h3>
+                </Link>
                 <div style={{ fontSize: 14, opacity: 0.85 }}>
-                  {l.category} * {l.location}
+                  {l.category} --- {l.location}
                 </div>
               </div>
 
