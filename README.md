@@ -31,6 +31,8 @@ A full-stack marketplace platform built with **React**, **Express**, and **Postg
 - Owner-only edit listing
 - Owner-only status toggle (active ↔ sold)
 - Secure PATCH endpoint for status updates
+- Owner-only delete listing
+- Full CRUD implementation with ownership enforcement
 
 ### Contact System
 
@@ -49,13 +51,14 @@ A full-stack marketplace platform built with **React**, **Express**, and **Postg
 
 ## Architecture Overview
 
-- **React** handles UI and state
-- **Express** exposes REST APIs and serves the frontend
-- **PostgreSQL** stores users, sessions, and messages
-- **Sessions** stored server-side for security
-- Clear separation of concerns across frontend and backend
-- RESTful partial updates using PATCH
-- Ownership enforcement at API layer for listing edits and status changes
+- **React** handles UI rendering and client-side state
+- **Express** exposes RESTful APIs and serves the frontend build
+- **PostgreSQL** stores users, sessions, messages, and listings
+- **Session-based authentication** with server-side session storage
+- Clear separation of concerns across frontend and backend layers
+- RESTful route design (GET, POST, PUT, PATCH, DELETE)
+- Ownership enforcement at the API layer for edit, status, and delete operations
+- Partial updates implemented using PATCH for resource state changes
 
 ### Frontend Architecture
 

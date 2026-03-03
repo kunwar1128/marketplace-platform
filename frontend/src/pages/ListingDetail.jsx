@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 
 function ListingDetail({ user }) {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [listing, setListing] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -26,8 +28,6 @@ function ListingDetail({ user }) {
         if (!result.ok) throw new Error("Not found");
 
         const rows = await result.json();
-
-        console.log(user);
 
         setListing(rows.listing);
       } catch (err) {
@@ -69,6 +69,32 @@ function ListingDetail({ user }) {
     }
   }
 
+  async function handleDelete() {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete the listing?",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/listings/${id}`, {
+        credentials: "include",
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Delete failed");
+        return;
+      }
+
+      navigate("/listings");
+    } catch (err) {
+      setError("Server error");
+    }
+  }
+
   if (error) return <p>{error}</p>;
   if (loading) return <p>Loading...</p>;
   if (!listing) return <p>Loading...</p>;
@@ -80,6 +106,9 @@ function ListingDetail({ user }) {
           <Link to={`/listings/${listing.id}/edit`}>Edit</Link>
           <button onClick={handleToggleStatus}>
             Mark as {listing.status === "active" ? "Sold" : "Active"}
+          </button>
+          <button onClick={handleDelete} style={{ color: "red" }}>
+            Delete Listing
           </button>
         </div>
       )}

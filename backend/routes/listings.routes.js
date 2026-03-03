@@ -157,7 +157,7 @@ router.put("/:id", requireAuth, async (req, res) => {
     return res.status(400).json({ error: "Invalid ID format." });
 
   try {
-    // Check ownership
+    // Checking ownership
     const { rows } = await pool.query(
       `SELECT user_id FROM listings WHERE id = $1`,
       [id],
@@ -244,6 +244,36 @@ router.patch("/:id/status", requireAuth, async (req, res) => {
   } catch (err) {
     console.error("Error patching status:", err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+// DELETE the listing of authorized owner
+
+router.delete("/:id", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id))
+    return res.status(400).json({ error: "Invalid ID format." });
+
+  try {
+    // Checking ownership
+    const { rows } = await pool.query(
+      `SELECT user_id FROM listings WHERE id = $1`,
+      [id],
+    );
+
+    if (rows.length === 0)
+      return res.status(404).json({ error: "Listing not found." });
+
+    if (rows[0].user_id !== req.session.userId)
+      return res.status(403).json({ error: "Forbidden." });
+
+    await pool.query(`DELETE FROM listings WHERE id = $1 RETURNING id;`, [id]);
+
+    return res.status(200).json({ message: "Listing deleted successfully." });
+  } catch (err) {
+    console.error("Error deleting listing", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 
