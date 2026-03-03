@@ -5,6 +5,7 @@ import {
   validateLength,
   validatePositiveInteger,
   validateNonNegativeInteger,
+  validateListing,
 } from "../utils/validation.js";
 
 const router = Router();
@@ -133,7 +134,7 @@ router.get("/:id", async (req, res) => {
       .json({ error: "Invalid ID format. ID must be a number." });
   try {
     const { rows } = await pool.query(
-      `SELECT id, title, description, price_cents, currency, category, location, status, created_at FROM listings WHERE id = $1`,
+      `SELECT id, user_id, title, description, price_cents, currency, category, location, status, created_at FROM listings WHERE id = $1`,
       [id],
     );
 
@@ -144,6 +145,105 @@ router.get("/:id", async (req, res) => {
   } catch (err) {
     console.log("Error getting the listing:", err);
     return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// PUT for the owner of the listings to edit
+
+router.put("/:id", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id))
+    return res.status(400).json({ error: "Invalid ID format." });
+
+  try {
+    // Check ownership
+    const { rows } = await pool.query(
+      `SELECT user_id FROM listings WHERE id = $1`,
+      [id],
+    );
+    console.log(rows);
+
+    if (rows.length === 0)
+      return res.status(404).json({ error: "Listings not found" });
+
+    console.log(
+      "User requesting:",
+      rows[0].user_id,
+      "Logged in user:",
+      req.session.userId,
+    );
+    if (rows[0].user_id !== req.session.userId)
+      return res.status(403).json({ error: "Forbidden" });
+
+    const {
+      title,
+      description,
+      price_cents,
+      currency,
+      category,
+      location,
+      status,
+    } = req.body;
+
+    const { error } = validateListing(req.body);
+    if (error) return res.status(400).json({ error });
+
+    const updated = await pool.query(
+      `UPDATE listings SET title=$1, description=$2, price_cents=$3, currency=$4, category=$5, location=$6, status=$7 WHERE id=$8 RETURNING *;`,
+      [
+        title,
+        description,
+        price_cents,
+        currency,
+        category,
+        location,
+        status,
+        id,
+      ],
+    );
+
+    res.status(200).json({ listing: updated.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// PATCH to edit the status of the listing given by the id
+
+router.patch("/:id/status", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id))
+    return res.status(400).json({ error: "Invalid ID format." });
+
+  const { status } = req.body;
+
+  if (!["active", "sold"].includes(status))
+    return res.status(400).json({ error: "Invalid status value." });
+
+  try {
+    // Checking the ownership
+    const { rows } = await pool.query(
+      `SELECT user_id FROM listings WHERE id = $1`,
+      [id],
+    );
+    if (rows.length === 0)
+      return res.status(404).json({ error: "Listing not found" });
+
+    if (rows[0].user_id !== req.session.userId)
+      return res.status(403).json({ error: "Forbidden" });
+
+    const updated = await pool.query(
+      `UPDATE listings SET status = $1 WHERE id = $2 RETURNING status;`,
+      [status, id],
+    );
+
+    return res.status(200).json({ status: updated.rows[0].status });
+  } catch (err) {
+    console.error("Error patching status:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 

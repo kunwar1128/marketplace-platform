@@ -6,12 +6,16 @@
 //   next();
 // }
 
+// The requireAuth middleware authenticates if the user is logged in
+
 export function requireAuth(req, res, next) {
   if (!req.session?.userId) {
     return res.status(401).json({ error: "Unauthorized" });
   }
   next();
 }
+
+// The requireAdmin middleware authenticates if the user is logged in and is the admin
 
 export function requireAdmin(req, res, next) {
   if (!req.session?.userId) {

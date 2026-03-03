@@ -28,6 +28,9 @@ A full-stack marketplace platform built with **React**, **Express**, and **Postg
 - Server-side validation + database constraints
 - Browse listings with pagination
 - Listing detail page (`/listings/:id`) with full listing info
+- Owner-only edit listing
+- Owner-only status toggle (active ↔ sold)
+- Secure PATCH endpoint for status updates
 
 ### Contact System
 
@@ -51,6 +54,8 @@ A full-stack marketplace platform built with **React**, **Express**, and **Postg
 - **PostgreSQL** stores users, sessions, and messages
 - **Sessions** stored server-side for security
 - Clear separation of concerns across frontend and backend
+- RESTful partial updates using PATCH
+- Ownership enforcement at API layer for listing edits and status changes
 
 ### Frontend Architecture
 
@@ -77,9 +82,9 @@ marketplace-platform/
 │   │   ├── admin.routes.js
 │   │   ├── auth.routes.js
 │   │   ├── contact.routes.js
-│   │   └── listings.routes.js
+│   │   └── listings.routes.js   ← (now includes PUT + PATCH)
 │   ├── utils/
-│   │   └── validation.js
+│   │   └── validation.js        ← (new)
 │   └── index.js
 │
 ├── frontend/
@@ -93,7 +98,9 @@ marketplace-platform/
 │   │   │   └── Layout.jsx
 │   │   ├── pages/
 │   │   │   ├── CreateListing.jsx
+│   │   │   ├── EditListing.jsx         ← (new)
 │   │   │   ├── ListingsBrowse.jsx
+│   │   │   ├── ListingDetail.jsx       ← (new)
 │   │   │   └── Login.jsx
 │   │   ├── routes/
 │   │   │   ├── AppRoutes.jsx

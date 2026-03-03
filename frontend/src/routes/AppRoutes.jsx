@@ -8,6 +8,7 @@ import RequireAuth from "./RequireAuth";
 import RequireAdmin from "./RequireAdmin";
 import LoginRoute from "./LoginRoute";
 import ListingDetail from "../pages/ListingDetail";
+import EditListing from "../pages/EditListing";
 
 function AppRoutes({ user, setUser, onLogout }) {
   return (
@@ -39,7 +40,16 @@ function AppRoutes({ user, setUser, onLogout }) {
           }
         />
 
-        <Route path="/listings/:id" element={<ListingDetail />} />
+        <Route path="/listings/:id" element={<ListingDetail user={user} />} />
+
+        <Route
+          path="listings/:id/edit"
+          element={
+            <RequireAuth user={user}>
+              <EditListing />
+            </RequireAuth>
+          }
+        />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

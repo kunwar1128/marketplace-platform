@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
-function ListingDetail() {
+function ListingDetail({ user }) {
   const { id } = useParams();
   const [listing, setListing] = useState(null);
 
@@ -27,6 +27,8 @@ function ListingDetail() {
 
         const rows = await result.json();
 
+        console.log(user);
+
         setListing(rows.listing);
       } catch (err) {
         if (err.name === "AbortError") return;
@@ -41,12 +43,46 @@ function ListingDetail() {
     return () => ac.abort();
   }, [id]);
 
+  async function handleToggleStatus() {
+    try {
+      const newStatus = listing.status === "active" ? "sold" : "active";
+
+      const res = await fetch(`/api/listings/${id}/status`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Update failed");
+        return;
+      }
+
+      setListing((prev) => ({ ...prev, status: data.status }));
+    } catch (err) {
+      setError("Server error");
+    }
+  }
+
   if (error) return <p>{error}</p>;
   if (loading) return <p>Loading...</p>;
   if (!listing) return <p>Loading...</p>;
 
   return (
     <div>
+      {user && user.id === listing.user_id && (
+        <div>
+          <Link to={`/listings/${listing.id}/edit`}>Edit</Link>
+          <button onClick={handleToggleStatus}>
+            Mark as {listing.status === "active" ? "Sold" : "Active"}
+          </button>
+        </div>
+      )}
       <h2>{listing.title}</h2>
       <p>{listing.description}</p>
       <p>
