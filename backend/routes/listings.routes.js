@@ -93,6 +93,7 @@ router.get("/", async (req, res) => {
   const status = req.query.status ? String(req.query.status).trim() : "active";
   const limit = Math.min(Number(req.query.limit ?? 20), 50);
   const offset = Number(req.query.offset ?? 0);
+  const userId = req.session.userId;
 
   if (!["active", "sold", "archived"].includes(status))
     return res.status(400).json({ error: "Invalid status" });
@@ -105,12 +106,13 @@ router.get("/", async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, user_id, title, description, price_cents, currency, category, location, status, created_at 
-      FROM listings 
-      WHERE status = $1 
-      ORDER BY created_at DESC 
-      LIMIT $2 OFFSET $3;`,
-      [status, limit, offset],
+      `SELECT l.id, l.user_id, l.title, l.description, l.price_cents, l.currency, l.category, l.location, l.status, l.created_at, f.listing_id IS NOT NULL AS favourited
+      FROM listings l LEFT JOIN favourites f 
+      ON f.listing_id = l.id AND f.user_id = $1
+      WHERE l.status = $2
+      ORDER BY l.created_at DESC 
+      LIMIT $3 OFFSET $4;`,
+      [userId, status, limit, offset],
     );
 
     return res.json({
@@ -123,10 +125,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET for fetching the ad with the id
+// GET for fetching the ad with the listing id
 
 router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
+  const userId = req.session.userId;
 
   if (!Number.isInteger(id))
     return res
@@ -134,8 +137,11 @@ router.get("/:id", async (req, res) => {
       .json({ error: "Invalid ID format. ID must be a number." });
   try {
     const { rows } = await pool.query(
-      `SELECT id, user_id, title, description, price_cents, currency, category, location, status, created_at FROM listings WHERE id = $1`,
-      [id],
+      `SELECT l.id, l.user_id, l.title, l.description, l.price_cents, l.currency, l.category, l.location, l.status, l.created_at, f.listing_id IS NOT NULL AS favourited
+      FROM listings l LEFT JOIN favourites f
+      ON l.id = f.listing_id AND f.user_id = $1
+      WHERE l.id = $2`,
+      [userId, id],
     );
 
     if (rows.length === 0)

@@ -1,16 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { apiFetch } from "../api/apiFetch";
-
-function formatMoney(priceCents, currency = "CAD") {
-  const amount = (priceCents ?? 0) / 100;
-  // Language sensitive number formating
-  return new Intl.NumberFormat("en-CA", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  }).format(amount);
-}
+import ListingCard from "../components/ListingCard";
 
 export default function ListingsBrowse() {
   const [status, setStatus] = useState("active");
@@ -68,6 +57,12 @@ export default function ListingsBrowse() {
     return () => ac.abort();
   }, [status, limit, offset]);
 
+  function handleFavouriteChange(id, newValue) {
+    setListings((prev) =>
+      prev.map((l) => (l.id === id ? { ...l, favourited: newValue } : l)),
+    );
+  }
+
   return (
     <div style={{ padding: 16, maxWidth: 900, margin: "0 auto" }}>
       <h1>Browse Listings</h1>
@@ -118,43 +113,13 @@ export default function ListingsBrowse() {
       {error && <p style={{ color: "crimson" }}>{error}</p>}
 
       {!loading && !error && listings.length === 0 && <p>No listings found.</p>}
-
       <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: 12 }}>
         {listings.map((l) => (
-          <li
+          <ListingCard
             key={l.id}
-            style={{ border: "1px solid #ddd", borderRadius: 10, padding: 12 }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: 12,
-              }}
-            >
-              <div>
-                <Link to={`/listings/${l.id}`}>
-                  <h3 style={{ margin: "0 0 6px 0" }}>{l.title}</h3>
-                </Link>
-                <div style={{ fontSize: 14, opacity: 0.85 }}>
-                  {l.category} --- {l.location}
-                </div>
-              </div>
-
-              <div style={{ fontWeight: 700 }}>
-                {formatMoney(l.price_cents, l.currency)}
-              </div>
-            </div>
-
-            <p style={{ marginTop: 10, marginBottom: 0, opacity: 0.9 }}>
-              {l.description}
-            </p>
-
-            <div style={{ marginTop: 10, fontSize: 12, opacity: 0.7 }}>
-              Status: {l.status} * Posted:{" "}
-              {new Date(l.created_at).toLocaleDateString()}
-            </div>
-          </li>
+            listing={l}
+            handleFavouriteChange={handleFavouriteChange}
+          />
         ))}
       </ul>
     </div>

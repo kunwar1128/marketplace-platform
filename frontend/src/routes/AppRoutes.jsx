@@ -9,6 +9,7 @@ import RequireAdmin from "./RequireAdmin";
 import LoginRoute from "./LoginRoute";
 import ListingDetail from "../pages/ListingDetail";
 import EditListing from "../pages/EditListing";
+import MyFavourites from "../pages/MyFavourites";
 
 function AppRoutes({ user, setUser, onLogout }) {
   return (
@@ -47,6 +48,15 @@ function AppRoutes({ user, setUser, onLogout }) {
           element={
             <RequireAuth user={user}>
               <EditListing />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/favourites"
+          element={
+            <RequireAuth user={user}>
+              <MyFavourites />
             </RequireAuth>
           }
         />

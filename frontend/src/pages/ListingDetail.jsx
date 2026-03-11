@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import FavouriteButton from "../components/FavouriteButton";
 
 function ListingDetail({ user }) {
   const { id } = useParams();
@@ -13,35 +14,33 @@ function ListingDetail({ user }) {
   useEffect(() => {
     const ac = new AbortController();
 
-    async function fetchListing() {
+    async function loadData() {
       setError("");
       try {
-        const result = await fetch(`/api/listings/${id}`, {
+        const listingRes = await fetch(`/api/listings/${id}`, {
           signal: ac.signal,
-          method: "GET",
           credentials: "include",
-          headers: {
-            "content-type": "application/json",
-          },
         });
 
-        if (!result.ok) throw new Error("Not found");
+        if (!listingRes.ok) throw new Error("Not found");
 
-        const rows = await result.json();
+        const listingData = await listingRes.json();
 
-        setListing(rows.listing);
+        setListing(listingData.listing);
       } catch (err) {
         if (err.name === "AbortError") return;
         setError("Listing not found");
       } finally {
-        setLoading(false);
+        if (!ac.signal.aborted) setLoading(false);
       }
     }
 
-    fetchListing();
+    loadData();
 
     return () => ac.abort();
   }, [id]);
+
+  // Status toggle function
 
   async function handleToggleStatus() {
     try {
@@ -68,6 +67,8 @@ function ListingDetail({ user }) {
       setError("Server error");
     }
   }
+
+  // Delete listing function
 
   async function handleDelete() {
     const confirmed = window.confirm(
@@ -111,6 +112,13 @@ function ListingDetail({ user }) {
             Delete Listing
           </button>
         </div>
+      )}
+
+      {user && (
+        <FavouriteButton
+          listingId={listing.id}
+          initialFavourited={listing.favourited}
+        />
       )}
       <h2>{listing.title}</h2>
       <p>{listing.description}</p>

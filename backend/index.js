@@ -9,6 +9,7 @@ import adminRoutes from "./routes/admin.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import contactRoutes from "./routes/contact.routes.js";
 import listingsRoutes from "./routes/listings.routes.js";
+import favouritesRoutes from "./routes/favourites.routes.js";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -28,6 +29,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/listings", listingsRoutes);
+app.use("/api/favourites", favouritesRoutes);
 
 // **************  SERVE REACT    ********************************
 

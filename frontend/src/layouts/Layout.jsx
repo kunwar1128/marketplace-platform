@@ -7,6 +7,7 @@ function Layout({ user, onLogout }) {
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           <Link to="/">Browse</Link>
           <Link to="/listings/new">Create Listing</Link>
+          <Link to={`/favourites`}>My Favourites</Link>
 
           {user?.role === "admin" && <Link to="/admin/inbox">Admin Inbox</Link>}
 
