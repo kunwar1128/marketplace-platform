@@ -37,6 +37,10 @@ The project focuses on clean architecture, strong data integrity, and scalable b
 - Owner-only delete listing
 - Full CRUD implementation with ownership enforcement
 - Reusable ListingCard component for listing UI
+- Image upload support for listings (multipart/form-data)
+- Image preview before submission (client-side)
+- Image display in listing cards and detail page
+- Automatic image cleanup on listing deletion (no orphan files)
 
 ### Contact System
 
@@ -71,6 +75,7 @@ The project focuses on clean architecture, strong data integrity, and scalable b
 - RESTful route design (GET, POST, PUT, PATCH, DELETE)
 - Ownership enforcement at the API layer for edit, status, and delete operations
 - Partial updates implemented using PATCH for resource state changes
+- File upload handling using multer with local storage (`/uploads`)
 
 ## System Architecture
 
@@ -102,6 +107,14 @@ ExpressAPI -->|Store Favourites| PostgreSQLDB
 - Clickable listings in Browse page
 - Proper error handling for not found listings
 - Reusable UI components (ListingCard, FavouriteButton)
+
+## File Upload System
+
+- Images are uploaded using multipart/form-data via multer
+- Stored locally in `/uploads` directory
+- File paths saved in database (`image_url`)
+- Served statically via Express
+- Automatically deleted when listing is removed
 
 ## API Error Format
 
@@ -193,7 +206,8 @@ marketplace-platform/
 │   │   └── database.js
 │   ├── middleware/
 │   │   ├── auth.js
-│   │   └── session.js
+│   │   ├── session.js
+│   │   └── upload.js
 │   ├── routes/
 │   │   ├── admin.routes.js
 │   │   ├── auth.routes.js
