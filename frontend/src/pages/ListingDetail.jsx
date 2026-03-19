@@ -26,6 +26,7 @@ function ListingDetail({ user }) {
 
         const listingData = await listingRes.json();
 
+        console.log(listingData.listing);
         setListing(listingData.listing);
       } catch (err) {
         if (err.name === "AbortError") return;
@@ -118,6 +119,18 @@ function ListingDetail({ user }) {
         <FavouriteButton
           listingId={listing.id}
           initialFavourited={listing.favourited}
+        />
+      )}
+      {listing.image_url && (
+        <img
+          src={`http://localhost:3000/${listing.image_url}`}
+          alt={listing.title}
+          style={{
+            maxHeight: 100,
+            objectFit: "contain",
+            borderRadius: 6,
+            marginBottom: 8,
+          }}
         />
       )}
       <h2>{listing.title}</h2>

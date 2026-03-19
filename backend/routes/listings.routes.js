@@ -7,12 +7,16 @@ import {
   validateNonNegativeInteger,
   validateListing,
 } from "../utils/validation.js";
+import { upload } from "../middleware/upload.js";
+import sharp from "sharp";
+import fs from "fs";
+import path from "path";
 
 const router = Router();
 
 /* POST /api/listings -- Create a listing (requires login) */
 
-router.post("/", requireAuth, async (req, res) => {
+router.post("/", requireAuth, upload.single("image"), async (req, res) => {
   const {
     title,
     description,
@@ -21,6 +25,12 @@ router.post("/", requireAuth, async (req, res) => {
     category,
     location,
   } = req.body;
+
+  const imageURL = req.file ? req.file.path : null;
+  // const resizedPath = `/uploads/resized-${req.file.filename}`;
+
+  // Resize image to max 800x800 while keeping aspect ratio
+  // await sharp(imageURL).resize(800, 800, { fit: "inside" }).toFile(resizedPath);
 
   //   API validation
 
@@ -65,7 +75,7 @@ router.post("/", requireAuth, async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO listings (user_id, title, description, price_cents, currency, category, location) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, user_id, title, description, price_cents, currency, category, location, status, created_at;`,
+      `INSERT INTO listings (user_id, title, description, price_cents, currency, category, location, image_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, user_id, title, description, price_cents, currency, category, location, status, created_at, image_url;`,
       [
         req.session.userId,
         cleaned.title,
@@ -74,6 +84,7 @@ router.post("/", requireAuth, async (req, res) => {
         cleaned.currency,
         cleaned.category,
         cleaned.location,
+        imageURL,
       ],
     );
 
@@ -106,7 +117,7 @@ router.get("/", async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT l.id, l.user_id, l.title, l.description, l.price_cents, l.currency, l.category, l.location, l.status, l.created_at, f.listing_id IS NOT NULL AS favourited
+      `SELECT l.id, l.user_id, l.title, l.description, l.price_cents, l.currency, l.category, l.location, l.status, l.created_at, l.image_url, f.listing_id IS NOT NULL AS favourited
       FROM listings l LEFT JOIN favourites f 
       ON f.listing_id = l.id AND f.user_id = $1
       WHERE l.status = $2
@@ -137,7 +148,7 @@ router.get("/:id", async (req, res) => {
       .json({ error: "Invalid ID format. ID must be a number." });
   try {
     const { rows } = await pool.query(
-      `SELECT l.id, l.user_id, l.title, l.description, l.price_cents, l.currency, l.category, l.location, l.status, l.created_at, f.listing_id IS NOT NULL AS favourited
+      `SELECT l.id, l.user_id, l.title, l.description, l.price_cents, l.currency, l.category, l.location, l.status, l.created_at, l.image_url, f.listing_id IS NOT NULL AS favourited
       FROM listings l LEFT JOIN favourites f
       ON l.id = f.listing_id AND f.user_id = $1
       WHERE l.id = $2`,
@@ -264,7 +275,7 @@ router.delete("/:id", requireAuth, async (req, res) => {
   try {
     // Checking ownership
     const { rows } = await pool.query(
-      `SELECT user_id FROM listings WHERE id = $1`,
+      `SELECT user_id, image_url FROM listings WHERE id = $1`,
       [id],
     );
 
@@ -273,6 +284,17 @@ router.delete("/:id", requireAuth, async (req, res) => {
 
     if (rows[0].user_id !== req.session.userId)
       return res.status(403).json({ error: "Forbidden." });
+
+    const imageUrl = rows[0].image_url;
+
+    if (imageUrl) {
+      const filePath = path.join(process.cwd(), imageUrl);
+      fs.unlink(filePath, (err) => {
+        // "ENOENT" file does not exist
+        if (err && err.code !== "ENOENT")
+          console.warn("File delete failed:", err.message);
+      });
+    }
 
     await pool.query(`DELETE FROM listings WHERE id = $1 RETURNING id;`, [id]);
 

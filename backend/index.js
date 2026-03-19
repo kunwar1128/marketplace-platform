@@ -30,6 +30,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/listings", listingsRoutes);
 app.use("/api/favourites", favouritesRoutes);
+app.use("/uploads", express.static("uploads"));
 
 // **************  SERVE REACT    ********************************
 

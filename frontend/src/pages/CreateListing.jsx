@@ -12,6 +12,7 @@ export default function CreateListing() {
     currency: "CAD",
     category: "",
     location: "",
+    image: null,
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -52,14 +53,19 @@ export default function CreateListing() {
 
     setSubmitting(true);
 
+    const formData = new FormData();
+
+    Object.entries(apiListing).forEach(([key, value]) =>
+      formData.append(key, value),
+    );
+
+    if (listing.image) formData.append("image", listing.image);
+
     try {
       const res = await fetch("/api/listings", {
         method: "POST",
         credentials: "include",
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(apiListing),
+        body: formData,
       });
 
       const data = await res.json().catch(() => ({}));
@@ -191,6 +197,31 @@ export default function CreateListing() {
               style={{ width: "100%", padding: 10, marginTop: 6 }}
             />
           </label>
+
+          <label>
+            Image
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                setListing((prev) => ({ ...prev, image: e.target.files[0] }))
+              }
+              style={{ width: "100%", marginTop: 6 }}
+            />
+          </label>
+
+          {listing.image && (
+            <img
+              src={URL.createObjectURL(listing.image)}
+              alt="preview"
+              style={{
+                maxHeight: 100,
+                objectFit: "contain",
+                borderRadius: 6,
+                marginTop: 10,
+              }}
+            />
+          )}
         </div>
 
         {error && <div style={{ color: "crimson" }}>{error}</div>}

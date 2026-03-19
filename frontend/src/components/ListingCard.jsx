@@ -12,6 +12,19 @@ function ListingCard({ listing, handleUnFavourite, handleFavouriteChange }) {
           gap: 12,
         }}
       >
+        {listing.image_url && (
+          <img
+            src={`http://localhost:3000/${listing.image_url}`}
+            alt={listing.title}
+            style={{
+              maxHeight: 100,
+              objectFit: "contain",
+              borderRadius: 6,
+              marginBottom: 8,
+            }}
+          />
+        )}
+
         <div>
           <Link to={`/listings/${listing.id}`}>
             <h3 style={{ margin: "0 0 6px 0" }}>{listing.title}</h3>
@@ -20,7 +33,6 @@ function ListingCard({ listing, handleUnFavourite, handleFavouriteChange }) {
             {listing.category} --- {listing.location}
           </div>
         </div>
-
         <div style={{ fontWeight: 700 }}>
           {formatMoney(listing.price_cents, listing.currency)}
         </div>

@@ -10,5 +10,8 @@ frontend/dist/
 # logs
 npm-debug.log*
 
+# uploads (images)
+backend/uploads
+
 # my files (FMI)
 for-mine.js
